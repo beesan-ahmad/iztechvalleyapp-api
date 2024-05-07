@@ -1,9 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { Task } from 'src/schemas/task.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
+import { PaginationDto } from 'src/common/dtos/pagination.dto';
 
 @Injectable()
 export class TaskService {
@@ -21,11 +22,21 @@ export class TaskService {
     }
   }
 
-  async findAll() {
+  async findAll(paginationDto: PaginationDto) {
     try {
-      return await this.taskModel.find().orFail();
+      const count = await this.taskModel.countDocuments({}).exec();
+      const data = await this.taskModel.find()
+        .skip((paginationDto.pageNumber - 1) * paginationDto.limit)
+        .limit(paginationDto.limit)
+        .select('-__v').orFail();
+
+      return {
+        data: data,
+        pageTotal: Math.ceil((count / paginationDto.limit)),
+        status: 200,
+      };
     } catch (error) {
-      throw new HttpException('Task Not Found', HttpStatus.NOT_FOUND);
+      throw new NotFoundException("There Is No Tasks");
     }
   }
 
