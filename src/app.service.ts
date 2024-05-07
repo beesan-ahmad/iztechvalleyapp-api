@@ -20,10 +20,10 @@ export class AppService {
     return newUser.save();
   }
 
-  async createTask(): Promise<Task> {
-    const newTask = new this.taskModel({
-      id: 1, title: 'create UI/UX', description: 'make app pages', status: 'complete'
-    })
-    return newTask.save();
-  }
+  // async createTask(): Promise<Task> {
+  //   const newTask = new this.taskModel({
+  //     id: 10, title: 'create UI/UX', description: 'make app pages', status: 'complete'
+  //   })
+  //   return newTask.save();
+  // }
 }

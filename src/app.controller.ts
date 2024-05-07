@@ -15,8 +15,8 @@ export class AppController {
     return this.appService.createUser();
   }
 
-  @Get('/task')
-  getTask() {
-    return this.appService.createTask();
-  }
+  // @Get('/task')
+  // getTask() {
+  //   return this.appService.createTask();
+  // }
 }
