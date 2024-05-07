@@ -1,4 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Task } from './task.schema';
+import mongoose from 'mongoose';
 
 @Schema()
 export class User {
@@ -23,6 +25,8 @@ export class User {
     @Prop({ length: 255 })
     profile_picture: string;
 
+    @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }] })
+    tasks: Task[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
