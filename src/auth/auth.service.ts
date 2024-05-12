@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { NewUserDTO } from 'src/users/dtos/new-user.dto';
 import { UserDetails } from 'src/users/user-details.interface';
+import { ExistingUserDTO } from 'src/users/dtos/existing-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -33,14 +34,42 @@ export class AuthService {
         return this.usersService._getUserDetails(newUser);
     }
 
-    // async signIn(username, pass) {
-    //     const user = await this.usersService.findOne(username);
-    //     if (user?.password !== pass) {
-    //         throw new UnauthorizedException();
-    //     }
-    //     const payload = { sub: user.userId, username: user.username };
-    //     return {
-    //         access_token: await this.jwtService.signAsync(payload),
-    //     };
-    // }
+    async doesPasswordMatch(
+        password: string,
+        hashedPassword: string,
+    ): Promise<boolean> {
+        return bcrypt.compare(password, hashedPassword);
+    }
+
+    async validateUser(
+        email: string,
+        password: string,
+    ): Promise<UserDetails | null> {
+        const user = await this.usersService.findByEmail(email);
+        const doesUserExist = !!user;
+
+        if (!doesUserExist) return null;
+
+        const doesPasswordMatch = await this.doesPasswordMatch(
+            password,
+            user.password,
+        );
+
+        if (!doesPasswordMatch) return null;
+
+        return this.usersService._getUserDetails(user);
+    }
+
+    async login(
+        existingUser: ExistingUserDTO,
+    ): Promise<{ token: string } | null> {
+        const { email, password } = existingUser;
+        const user = await this.validateUser(email, password);
+
+        if (!user)
+            throw new HttpException('Credentials invalid!', HttpStatus.UNAUTHORIZED);
+
+        const jwt = await this.jwtService.signAsync({ user });
+        return { token: jwt };
+    }
 }
