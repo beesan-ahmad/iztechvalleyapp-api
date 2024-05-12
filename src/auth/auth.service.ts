@@ -14,14 +14,14 @@ export class AuthService {
         return bcrypt.hash(password, 12);
       }
       
-    async signIn(username, pass) {
-        const user = await this.usersService.findOne(username);
-        if (user?.password !== pass) {
-            throw new UnauthorizedException();
-        }
-        const payload = { sub: user.userId, username: user.username };
-        return {
-            access_token: await this.jwtService.signAsync(payload),
-        };
-    }
+    // async signIn(username, pass) {
+    //     const user = await this.usersService.findOne(username);
+    //     if (user?.password !== pass) {
+    //         throw new UnauthorizedException();
+    //     }
+    //     const payload = { sub: user.userId, username: user.username };
+    //     return {
+    //         access_token: await this.jwtService.signAsync(payload),
+    //     };
+    // }
 }
