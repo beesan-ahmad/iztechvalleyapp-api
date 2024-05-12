@@ -8,7 +8,7 @@ import { UserDetails } from './user-details.interface';
 export class UsersService {
   constructor(
     @InjectModel('User') private readonly userModel: Model<UserDocument>,
-  ) {}
+  ) { }
 
   _getUserDetails(user: UserDocument): UserDetails {
     return {
@@ -16,5 +16,15 @@ export class UsersService {
       name: user.name,
       email: user.email,
     };
+  }
+
+  async create(name: string, email: string, hashedPassword: string,):
+    Promise<UserDocument> {
+    const newUser = new this.userModel({
+      name,
+      email,
+      password: hashedPassword,
+    });
+    return newUser.save();
   }
 }
